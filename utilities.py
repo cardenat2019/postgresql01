@@ -22,7 +22,7 @@ import logging
 #    "pool-size": 15
 # }
 def get_parameters(parameter_name_list):
-    ssm = boto3.client('ssm', region_name=os.environ.get('AWS_REGION', 'us-east-1') )
+    ssm = boto3.client('ssm', region_name=os.environ.get('AWS_REGION', 'us-east-2'))
     configuration_list = ssm.get_parameters(Names=parameter_name_list, WithDecryption=True)
     conn_props = dict()
     # Al diccionario global_config se le hace merge de último,
@@ -37,6 +37,29 @@ def get_parameters(parameter_name_list):
             global_config = param_json
     conn_props = {**global_config, **conn_props}
     return conn_props
+
+
+def get_parameters2(parameter_name_list):
+    ssm_client = boto3.client('ssm', region_name=os.environ.get('AWS_REGION', 'us-east-2'))
+    encrypted_credentials = ssm_client.get_parameters(Names=parameter_name_list, WithDecryption=True)
+
+    # Divide la cadena en una lista
+    credentials = encrypted_credentials['Parameters']['Value']
+
+    credentials_list = credentials.split(',')
+    print(credentials_list)
+
+    # # Si el usuario y la contraseña están encriptados, descifralos antes de usarlos
+    # if ssm_client.get_parameter(Name='username')['Parameter']['Type'] == 'SecureString':
+    #     db_username = boto3.client('kms').decrypt(CiphertextBlob=db_username)['Plaintext']
+    #
+    # if ssm_client.get_parameter(Name='password')['Parameter']['Type'] == 'SecureString':
+    #     db_password = boto3.client('kms').decrypt(CiphertextBlob=db_password)['Plaintext']
+
+    # Conecta a PostgreSQL usando las variables de entorno
+    # connection_string = f"host={db_host} dbname={db_name} user={db_username} password={db_password}"
+    # return connection_string
+    # conn = psycopg2.connect(connection_string)
 
 
 log_levels = {

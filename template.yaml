@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  PostgresqlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-postgresql01
+      Description: Este servicio es de pruebas
+      Handler: lambda_function.lambda_handler
+      Tracing: Active
+      Runtime: python3.12
+      CodeUri: .
+      Environment:
+        Variables:
+          DB_CONNECTION_PARAMS: /dev/postgresql
+          REGION: us-east-2
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 60
